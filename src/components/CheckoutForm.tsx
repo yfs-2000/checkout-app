@@ -13,7 +13,7 @@ const LS_KEY = "fp-checkout-form";
 
 // 默认表单数据
 const defaultFormData = (): CheckoutOptions => ({
-  env: "dev",
+  env: "test",
   appId: "2",
   merchantId: "1",
   merchantRsaPublicKey:
@@ -119,10 +119,10 @@ export const CheckoutForm = () => {
             className="border rounded px-2 py-1"
             value={form.env}
             onChange={(e) =>
-              handleChange("env", e.target.value as "dev" | "prod")
+              handleChange("env", e.target.value as "test" | "prod")
             }
           >
-            <option value="dev">dev</option>
+            <option value="test">test</option>
             <option value="prod">prod</option>
           </select>
         </label>
