@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-nocheck
+
 import {
   type CheckoutInstance,
   type CheckoutOptions,
@@ -7,7 +8,6 @@ import {
   openCheckoutModal,
 } from "@futurepay/checkout-sdk";
 import { useEffect, useRef, useState } from "react";
-
 // LocalStorage key
 const LS_KEY = "fp-checkout-form";
 
@@ -34,6 +34,8 @@ const defaultFormData = (): CheckoutOptions => ({
     returnUrl: "http://localhost:5173",
     webhookUrl: "http://localhost:5173/webhook",
   },
+  mode: "payment",
+  sessionToken: "",
   style: {
     maxWidth: "100%",
   },
@@ -69,7 +71,10 @@ export const CheckoutForm = () => {
   const addPaymentMethodPair = () => {
     if (!newKey) return;
     if (
-      Object.prototype.hasOwnProperty.call(form.orderInfo?.paymentMethod, newKey)
+      Object.prototype.hasOwnProperty.call(
+        form.orderInfo?.paymentMethod,
+        newKey
+      )
     ) {
       alert("该 Key 已存在");
       return;
@@ -109,6 +114,7 @@ export const CheckoutForm = () => {
     }));
   };
   const embedRef = useRef<CheckoutInstance | null>(null);
+  console.log(form);
   return (
     <div className="space-y-6">
       {/* 基础配置 */}
@@ -126,7 +132,19 @@ export const CheckoutForm = () => {
             <option value="prod">prod</option>
           </select>
         </label>
-
+        <label className="flex flex-col gap-1">
+          <span>模式 mode</span>
+          <select
+            className="border rounded px-2 py-1"
+            value={form.mode}
+            onChange={(e) =>
+              handleChange("mode", e.target.value as "payment" | "subscription")
+            }
+          >
+            <option value="payment">payment</option>
+            <option value="subscription">subscription</option>
+          </select>
+        </label>
         <label className="flex flex-col gap-1">
           <span>App ID</span>
           <input
@@ -142,6 +160,14 @@ export const CheckoutForm = () => {
             className="border rounded px-2 py-1"
             value={form.merchantId}
             onChange={(e) => handleChange("merchantId", e.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span>Session Token</span>
+          <input
+            className="border rounded px-2 py-1"
+            value={form.sessionToken}
+            onChange={(e) => handleChange("sessionToken", e.target.value)}
           />
         </label>
 
@@ -264,6 +290,17 @@ export const CheckoutForm = () => {
               className="border rounded px-2 py-1"
               value={form.orderInfo.webhookUrl}
               onChange={(e) => updateOrderInfo({ webhookUrl: e.target.value })}
+            />
+          </label>
+          <label className="flex flex-col gap-1 md:col-span-2">
+            <span>directReturn</span>
+            <input
+              type="checkbox"
+              className="border rounded px-2 py-1 w-4"
+              checked={form.orderInfo.directReturn}
+              onChange={(e) =>
+                updateOrderInfo({ directReturn: e.target.checked })
+              }
             />
           </label>
         </div>
