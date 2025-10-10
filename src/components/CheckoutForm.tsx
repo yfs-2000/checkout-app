@@ -26,16 +26,16 @@ const defaultFormData = (): CheckoutOptions => ({
     paymentMethod: {
       firstName: "ming",
       lastName: "xing",
+      type: "intercards",
     },
+    isexchange: false,
     productDetail: "购买产品详情/订单描述",
     countryCode: "HK",
     origin: "fffmall.com",
-    reference: `24092905000017-${Date.now()}`,
     returnUrl: "http://localhost:5173",
     webhookUrl: "http://localhost:5173/webhook",
   },
   mode: "payment",
-  sessionToken: "",
   style: {
     maxWidth: "100%",
   },
@@ -114,7 +114,7 @@ export const CheckoutForm = () => {
     }));
   };
   const embedRef = useRef<CheckoutInstance | null>(null);
-  console.log(form);
+
   return (
     <div className="space-y-6">
       {/* 基础配置 */}
@@ -167,7 +167,9 @@ export const CheckoutForm = () => {
           <input
             className="border rounded px-2 py-1"
             value={form.sessionToken}
-            onChange={(e) => handleChange("sessionToken", e.target.value)}
+            onChange={(e) =>
+              handleChange("sessionToken", e.target.value || undefined)
+            }
           />
         </label>
 
@@ -266,16 +268,7 @@ export const CheckoutForm = () => {
             />
           </label>
 
-          <label className="flex flex-col gap-1">
-            <span>Reference</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.reference}
-              onChange={(e) => updateOrderInfo({ reference: e.target.value })}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 md:col-span-2">
+          <label className="flex flex-col gap-1 md:col-span-3">
             <span>Return URL</span>
             <input
               className="border rounded px-2 py-1"
@@ -284,7 +277,7 @@ export const CheckoutForm = () => {
             />
           </label>
 
-          <label className="flex flex-col gap-1 md:col-span-2">
+          <label className="flex flex-col gap-1 md:col-span-3">
             <span>Webhook URL</span>
             <input
               className="border rounded px-2 py-1"
@@ -292,7 +285,7 @@ export const CheckoutForm = () => {
               onChange={(e) => updateOrderInfo({ webhookUrl: e.target.value })}
             />
           </label>
-          <label className="flex flex-col gap-1 md:col-span-2">
+          <label className="flex items-center  gap-1">
             <span>directReturn</span>
             <input
               type="checkbox"
@@ -300,6 +293,18 @@ export const CheckoutForm = () => {
               checked={form.orderInfo.directReturn}
               onChange={(e) =>
                 updateOrderInfo({ directReturn: e.target.checked })
+              }
+            />
+          </label>
+
+          <label className="flex  items-center gap-1">
+            <span>isexchange</span>
+            <input
+              type="checkbox"
+              className="border rounded px-2 py-1 w-4"
+              checked={form.orderInfo.isexchange}
+              onChange={(e) =>
+                updateOrderInfo({ isexchange: e.target.checked })
               }
             />
           </label>
@@ -367,7 +372,15 @@ export const CheckoutForm = () => {
       <div className="flex flex-wrap gap-4">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={() => openCheckoutModal(form)}
+          onClick={() => {
+            openCheckoutModal({
+              ...form,
+              orderInfo: {
+                ...form.orderInfo,
+                reference: `test-${Date.now()}`,
+              },
+            });
+          }}
         >
           打开弹窗 Open Modal
         </button>
@@ -376,12 +389,12 @@ export const CheckoutForm = () => {
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           onClick={async () => {
             if (!containerRef.current) return;
+
             embedRef.current = await embedCheckout(containerRef.current, {
               ...form,
-              callbacks: {
-                onSuccess() {
-                  window.location.href = "https://www.baidu.com";
-                },
+              orderInfo: {
+                ...form.orderInfo,
+                reference: `test-${Date.now()}`,
               },
             });
           }}
@@ -390,8 +403,54 @@ export const CheckoutForm = () => {
         </button>
       </div>
 
-      {/* 嵌入容器 */}
-      <div ref={containerRef} className="w-[420px]" />
+      {/* 嵌入式收银台展示 */}
+      <div className="mt-8 space-y-4">
+        {/* 顶部文案 */}
+        <div className="text-center space-y-2">
+          <h3 className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2">
+            安全支付收银台
+          </h3>
+          <p className="text-sm text-gray-600">
+            支持多种支付方式 · 银行级安全加密 · 全球支付网络
+          </p>
+          <div className="flex justify-center gap-4 text-xs text-gray-500">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+              SSL加密
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+              PCI合规
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+              实时验证
+            </span>
+          </div>
+        </div>
+
+        {/* 嵌入容器 */}
+        <div className="relative">
+          <div ref={containerRef} className="w-[420px] mx-auto" />
+        </div>
+
+        {/* 底部提示文案 */}
+        <div className="text-center space-y-3 pt-4">
+          <div className="flex justify-center gap-6 text-xs text-gray-500">
+            <span className="flex items-center gap-1">🔒 数据加密传输</span>
+            <span className="flex items-center gap-1">⚡ 秒级支付确认</span>
+            <span className="flex items-center gap-1">🌍 支持全球支付</span>
+          </div>
+          <p className="text-xs text-gray-400 max-w-md mx-auto">
+            我们采用业界领先的安全技术，确保您的支付信息安全。支持Visa、MasterCard、American
+            Express等主流支付方式。
+          </p>
+          <div className="inline-flex items-center gap-2 text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+            由 FuturePay 提供技术支持
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
