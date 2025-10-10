@@ -32,8 +32,8 @@ const defaultFormData = (): CheckoutOptions => ({
     productDetail: "购买产品详情/订单描述",
     countryCode: "HK",
     origin: "fffmall.com",
-    returnUrl: "http://localhost:5173",
-    webhookUrl: "http://localhost:5173/webhook",
+    returnUrl: "https://futurepay.global/",
+    webhookUrl: "https://futurepay.global/webhook",
   },
   mode: "payment",
   style: {
@@ -145,23 +145,9 @@ export const CheckoutForm = () => {
             <option value="subscription">subscription</option>
           </select>
         </label>
-        <label className="flex flex-col gap-1">
-          <span>App ID</span>
-          <input
-            className="border rounded px-2 py-1"
-            value={form.appId}
-            onChange={(e) => handleChange("appId", e.target.value)}
-          />
-        </label>
 
-        <label className="flex flex-col gap-1">
-          <span>Merchant ID</span>
-          <input
-            className="border rounded px-2 py-1"
-            value={form.merchantId}
-            onChange={(e) => handleChange("merchantId", e.target.value)}
-          />
-        </label>
+
+
         <label className="flex flex-col gap-1">
           <span>Session Token</span>
           <input
@@ -173,16 +159,7 @@ export const CheckoutForm = () => {
           />
         </label>
 
-        <label className="flex flex-col gap-1 md:col-span-2">
-          <span>Merchant RSA Public Key</span>
-          <textarea
-            className="border rounded px-2 py-1 h-24"
-            value={form.merchantRsaPublicKey}
-            onChange={(e) =>
-              handleChange("merchantRsaPublicKey", e.target.value)
-            }
-          />
-        </label>
+
         <label className="flex flex-col gap-1">
           <span>Theme</span>
           <select
