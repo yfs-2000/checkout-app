@@ -24,8 +24,6 @@ const defaultFormData = (): CheckoutOptions => ({
       value: 100,
     },
     paymentMethod: {
-      firstName: "ming",
-      lastName: "xing",
       type: "intercards",
     },
     isexchange: false,
@@ -34,6 +32,8 @@ const defaultFormData = (): CheckoutOptions => ({
     origin: "fffmall.com",
     returnUrl: "https://futurepay.global/",
     webhookUrl: "https://futurepay.global/webhook",
+    enableOneClick: false,
+    shopperReference: "testuser@qq.com",
   },
   mode: "payment",
   style: {
@@ -146,8 +146,6 @@ export const CheckoutForm = () => {
           </select>
         </label>
 
-
-
         <label className="flex flex-col gap-1">
           <span>Session Token</span>
           <input
@@ -158,7 +156,6 @@ export const CheckoutForm = () => {
             }
           />
         </label>
-
 
         <label className="flex flex-col gap-1">
           <span>Theme</span>
@@ -282,6 +279,18 @@ export const CheckoutForm = () => {
               checked={form.orderInfo.isexchange}
               onChange={(e) =>
                 updateOrderInfo({ isexchange: e.target.checked })
+              }
+            />
+          </label>
+
+          <label className="flex  items-center gap-1">
+            <span>enableOneClick</span>
+            <input
+              type="checkbox"
+              className="border rounded px-2 py-1 w-4"
+              checked={form.orderInfo.enableOneClick}
+              onChange={(e) =>
+                updateOrderInfo({ enableOneClick: e.target.checked })
               }
             />
           </label>
