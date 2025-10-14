@@ -42,11 +42,11 @@ const defaultFormData = (): CheckoutOptions => ({
 });
 
 export const CheckoutForm = () => {
-  // 初始化时尝试从 localStorage 读取
+  // 初始化时尝试从 sessionStorage 读取
   const [form, setForm] = useState<CheckoutOptions>(() => {
     if (typeof window !== "undefined") {
       try {
-        const stored = localStorage.getItem(LS_KEY);
+        const stored = sessionStorage.getItem(LS_KEY);
         if (stored) {
           return JSON.parse(stored) as CheckoutOptions;
         }
@@ -92,7 +92,7 @@ export const CheckoutForm = () => {
   // 持久化到 localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify(form));
+      sessionStorage.setItem(LS_KEY, JSON.stringify(form));
     } catch {
       /* ignore quota errors */
     }
