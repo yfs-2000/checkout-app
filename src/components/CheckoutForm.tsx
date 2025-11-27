@@ -539,21 +539,24 @@ export const CheckoutForm = () => {
                     }`}
                     onClick={async () => {
                       setDemoMode("embed");
-                      if (!containerRef.current) return;
+                      if (embedRef.current) {
+                        embedRef.current.close();
+                      }
+                      if (elementsRef.current) {
+                        elementsRef.current.close();
+                      }
                       // 小延时确保 DOM 渲染
                       setTimeout(async () => {
-                        if (containerRef.current) {
-                          embedRef.current = await embedCheckout(
-                            containerRef.current,
-                            {
-                              ...form,
-                              orderInfo: {
-                                ...form.orderInfo,
-                                reference: `test-${Date.now()}`,
-                              },
-                            }
-                          );
-                        }
+                        embedRef.current = await embedCheckout(
+                          "#embed-checkout-container",
+                          {
+                            ...form,
+                            orderInfo: {
+                              ...form.orderInfo,
+                              reference: `test-${Date.now()}`,
+                            },
+                          }
+                        );
                       }, 100);
                     }}
                   >
@@ -569,6 +572,12 @@ export const CheckoutForm = () => {
                     }`}
                     onClick={async () => {
                       setDemoMode("elements");
+                      if (embedRef.current) {
+                        embedRef.current.close();
+                      }
+                      if (elementsRef.current) {
+                        elementsRef.current.close();
+                      }
                       // 小延时确保 DOM 渲染
                       setTimeout(async () => {
                         elementsRef.current = await createElementsCheckout(
@@ -623,11 +632,8 @@ export const CheckoutForm = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-                      <div
-                        ref={containerRef}
-                        className="w-full min-h-[400px]"
-                      />
+                    <div className="bg-white p-4  shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+                      <div id="embed-checkout-container" className="w-full " />
                     </div>
                     <div className="mt-6 text-center">
                       <div className="inline-flex items-center gap-1.5 text-xs text-gray-400">
@@ -663,7 +669,7 @@ export const CheckoutForm = () => {
                         {/* Elements Container */}
                         <div
                           id="elements-checkout-container"
-                          className="min-h-[200px] rounded-lg"
+                          className="rounded-lg"
                         ></div>
 
                         <button
@@ -686,7 +692,7 @@ export const CheckoutForm = () => {
                             }
                           }}
                         >
-                          Pay {form.orderInfo.amount.currency}{" "}
+                          You will pay {form.orderInfo.amount.currency}{" "}
                           {form.orderInfo.amount.value}
                         </button>
                       </div>
