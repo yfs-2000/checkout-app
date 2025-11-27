@@ -4,6 +4,7 @@
 import {
   type CheckoutInstance,
   type CheckoutOptions,
+  createElementsCheckout,
   embedCheckout,
   openCheckoutModal,
 } from "@futurepay/checkout-sdk";
@@ -59,6 +60,7 @@ export const CheckoutForm = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
+  const [email, setEmail] = useState("");
 
   const removePaymentMethodKey = (key: string) => {
     // 删除指定 key
@@ -113,7 +115,17 @@ export const CheckoutForm = () => {
       orderInfo: { ...prev?.orderInfo, ...updates },
     }));
   };
+
+  const updateCheckoutConfig = (
+    updates: Partial<CheckoutOptions["checkoutConfig"]>
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      checkoutConfig: { ...prev?.checkoutConfig, ...updates },
+    }));
+  };
   const embedRef = useRef<CheckoutInstance | null>(null);
+  const elementsRef = useRef<CheckoutInstance | null>(null);
 
   return (
     <div className="space-y-6">
@@ -161,14 +173,14 @@ export const CheckoutForm = () => {
           <span>Theme</span>
           <select
             className="border rounded px-2 py-1"
-            value={form.theme}
+            value={form.checkoutConfig?.theme || ""}
             onChange={(e) =>
-              handleChange(
-                "theme",
-                e.target.value as "light" | "dark" | "system"
-              )
+              updateCheckoutConfig({
+                theme: e.target.value as "light" | "dark" | "system",
+              })
             }
           >
+            <option value="">请选择主题</option>
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="system">system</option>
@@ -387,7 +399,73 @@ export const CheckoutForm = () => {
         >
           嵌入收银台 Embed Checkout
         </button>
+        {/* 打开element 收银台 */}
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={async () => {
+            elementsRef.current = await createElementsCheckout(
+              "#elements-checkout-container",
+              {
+                ...form,
+                orderInfo: {
+                  ...form.orderInfo,
+                  reference: `test-${Date.now()}`,
+                },
+              }
+            );
+          }}
+        >
+          打开element 收银台 Elements Checkout
+        </button>
       </div>
+
+      {/* Elements Checkout 邮箱输入和提交区域 */}
+      {
+        <div className="bg-gray-50 p-4 rounded-lg space-y-4 w-[420px]">
+          <h4 className="text-lg font-medium text-gray-800">
+            Elements Checkout 提交
+          </h4>
+          <div className="flex flex-col gap-2">
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-gray-700">
+                邮箱地址
+              </span>
+              <input
+                id="email"
+                type="email"
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="请输入邮箱地址"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+            <div
+              className="flex flex-col gap-2"
+              id="elements-checkout-container"
+            ></div>
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={!email || !elementsRef.current}
+              onClick={async () => {
+                if (!elementsRef.current || !email) return;
+
+                try {
+                  const data = await elementsRef.current.elementsSubmit({
+                    paymentMethod: {
+                      shopperEmail: email,
+                    },
+                  });
+                  console.log("提交成功:", data);
+                } catch (error) {
+                  console.error("提交失败:", error);
+                }
+              }}
+            >
+              提交支付 Elements Submit
+            </button>
+          </div>
+        </div>
+      }
 
       {/* 嵌入式收银台展示 */}
       <div className="mt-8 space-y-4">
