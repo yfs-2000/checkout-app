@@ -8,7 +8,24 @@ import {
   embedCheckout,
   openCheckoutModal,
 } from "@futurepay/checkout-sdk";
+import {
+  ChevronRight,
+  Code,
+  CreditCard,
+  Globe,
+  Layout,
+  Link as LinkIcon,
+  Lock,
+  Plus,
+  Settings,
+  ShieldCheck,
+  ShoppingCart,
+  Trash2,
+  Wallet,
+  Zap,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
 // LocalStorage key
 const LS_KEY = "fp-checkout-form";
 
@@ -28,7 +45,7 @@ const defaultFormData = (): CheckoutOptions => ({
       type: "intercards",
     },
     isexchange: false,
-    productDetail: "购买产品详情/订单描述",
+    productDetail: "Premium Subscription Plan",
     countryCode: "HK",
     origin: "fffmall.com",
     returnUrl: "https://futurepay.global/",
@@ -41,6 +58,83 @@ const defaultFormData = (): CheckoutOptions => ({
     maxWidth: "100%",
   },
 });
+
+// UI Components
+const SectionHeader = ({
+  icon: Icon,
+  title,
+}: {
+  icon: React.ElementType;
+  title: string;
+}) => (
+  <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
+    <Icon className="w-5 h-5 text-blue-600" />
+    <h3 className="font-semibold text-gray-800">{title}</h3>
+  </div>
+);
+
+const InputGroup = ({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <label className={`flex flex-col gap-1.5 ${className}`}>
+    <span className="text-sm font-medium text-gray-600">{label}</span>
+    {children}
+  </label>
+);
+
+const StyledInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+  <input
+    {...props}
+    className={`border border-gray-200 rounded-lg px-3 py-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:border-gray-300 bg-white ${
+      props.className || ""
+    }`}
+  />
+);
+
+const StyledSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
+  <div className="relative">
+    <select
+      {...props}
+      className={`w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:border-gray-300 bg-white pr-8 ${
+        props.className || ""
+      }`}
+    />
+    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+      <ChevronRight className="w-4 h-4 rotate-90" />
+    </div>
+  </div>
+);
+
+const Toggle = ({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean | undefined;
+  onChange: (checked: boolean) => void;
+}) => (
+  <label className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors group">
+    <div className="relative inline-flex items-center">
+      <input
+        type="checkbox"
+        className="sr-only peer"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+    </div>
+    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+      {label}
+    </span>
+  </label>
+);
 
 export const CheckoutForm = () => {
   // 初始化时尝试从 sessionStorage 读取
@@ -61,10 +155,11 @@ export const CheckoutForm = () => {
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
   const [email, setEmail] = useState("");
+  const [demoMode, setDemoMode] = useState<"embed" | "elements" | null>(
+    "embed"
+  );
 
   const removePaymentMethodKey = (key: string) => {
-    // 删除指定 key
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [key]: _, ...rest } = form.orderInfo?.paymentMethod ?? {};
     updateOrderInfo({ paymentMethod: rest });
@@ -128,390 +223,503 @@ export const CheckoutForm = () => {
   const elementsRef = useRef<CheckoutInstance | null>(null);
 
   return (
-    <div className="space-y-6">
-      {/* 基础配置 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <label className="flex flex-col gap-1">
-          <span>运行环境 env</span>
-          <select
-            className="border rounded px-2 py-1"
-            value={form.env}
-            onChange={(e) =>
-              handleChange("env", e.target.value as "test" | "prod")
-            }
-          >
-            <option value="test">test</option>
-            <option value="prod">prod</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-1">
-          <span>模式 mode</span>
-          <select
-            className="border rounded px-2 py-1"
-            value={form.mode}
-            onChange={(e) =>
-              handleChange("mode", e.target.value as "payment" | "subscription")
-            }
-          >
-            <option value="payment">payment</option>
-            <option value="subscription">subscription</option>
-          </select>
-        </label>
+    <div className="min-h-screen bg-gray-50/50 p-6 font-sans text-gray-900">
+      <div className="max-w-[1600px] mx-auto space-y-6">
+        {/* Header */}
+        <header className="flex items-center justify-between bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <CreditCard className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Checkout Console
+              </h1>
+              <p className="text-xs text-gray-500 font-medium">
+                FuturePay Integration Demo
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-100">
+              Env: {form.env?.toUpperCase()}
+            </div>
+          </div>
+        </header>
 
-        <label className="flex flex-col gap-1">
-          <span>Session Token</span>
-          <input
-            className="border rounded px-2 py-1"
-            value={form.sessionToken}
-            onChange={(e) =>
-              handleChange("sessionToken", e.target.value || undefined)
-            }
-          />
-        </label>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          {/* Left Panel: Configuration */}
+          <div className="xl:col-span-5 space-y-6">
+            {/* Basic Settings */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+              <SectionHeader icon={Settings} title="基础配置 Environment" />
+              <div className="grid grid-cols-2 gap-4">
+                <InputGroup label="Environment">
+                  <StyledSelect
+                    value={form.env}
+                    onChange={(e) =>
+                      handleChange("env", e.target.value as "test" | "prod")
+                    }
+                  >
+                    <option value="test">Test Sandbox</option>
+                    <option value="prod">Production</option>
+                  </StyledSelect>
+                </InputGroup>
 
-        <label className="flex flex-col gap-1">
-          <span>Theme</span>
-          <select
-            className="border rounded px-2 py-1"
-            value={form.checkoutConfig?.theme || ""}
-            onChange={(e) =>
-              updateCheckoutConfig({
-                theme: e.target.value as "light" | "dark" | "system",
-              })
-            }
-          >
-            <option value="">请选择主题</option>
-            <option value="light">light</option>
-            <option value="dark">dark</option>
-            <option value="system">system</option>
-          </select>
-        </label>
-      </div>
+                <InputGroup label="Mode">
+                  <StyledSelect
+                    value={form.mode}
+                    onChange={(e) =>
+                      handleChange(
+                        "mode",
+                        e.target.value as "payment" | "subscription"
+                      )
+                    }
+                  >
+                    <option value="payment">Single Payment</option>
+                    <option value="subscription">Subscription</option>
+                  </StyledSelect>
+                </InputGroup>
 
-      {/* 订单信息 */}
-      <fieldset className="border rounded p-4 space-y-4">
-        <legend className="px-2">订单信息 orderInfo</legend>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <label className="flex flex-col gap-1">
-            <span>金额 currency</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.amount.currency}
-              onChange={(e) =>
-                updateOrderInfo({
-                  amount: {
-                    ...form.orderInfo.amount,
-                    currency: e.target.value,
-                  },
-                })
-              }
-            />
-          </label>
+                <InputGroup label="Theme" className="col-span-2">
+                  <StyledSelect
+                    value={form.checkoutConfig?.theme || ""}
+                    onChange={(e) =>
+                      updateCheckoutConfig({
+                        theme: e.target.value as "light" | "dark" | "system",
+                      })
+                    }
+                  >
+                    <option value="">Default</option>
+                    <option value="light">Light Mode</option>
+                    <option value="dark">Dark Mode</option>
+                    <option value="system">System Preference</option>
+                  </StyledSelect>
+                </InputGroup>
 
-          <label className="flex flex-col gap-1">
-            <span>金额 value</span>
-            <input
-              type="number"
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.amount.value}
-              onChange={(e) =>
-                updateOrderInfo({
-                  amount: {
-                    ...form.orderInfo.amount,
-                    value: Number(e.target.value),
-                  },
-                })
-              }
-            />
-          </label>
+                <InputGroup label="Session Token" className="col-span-2">
+                  <StyledInput
+                    placeholder="Optional session token"
+                    value={form.sessionToken}
+                    onChange={(e) =>
+                      handleChange("sessionToken", e.target.value || undefined)
+                    }
+                  />
+                </InputGroup>
+              </div>
+            </div>
 
-          <label className="flex flex-col gap-1">
-            <span>国家 countryCode</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.countryCode}
-              onChange={(e) => updateOrderInfo({ countryCode: e.target.value })}
-            />
-          </label>
+            {/* Order Details */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+              <SectionHeader icon={ShoppingCart} title="订单详情 Order Info" />
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <InputGroup label="Amount">
+                    <StyledInput
+                      type="number"
+                      value={form.orderInfo.amount.value}
+                      onChange={(e) =>
+                        updateOrderInfo({
+                          amount: {
+                            ...form.orderInfo.amount,
+                            value: Number(e.target.value),
+                          },
+                        })
+                      }
+                    />
+                  </InputGroup>
+                  <InputGroup label="Currency">
+                    <StyledInput
+                      value={form.orderInfo.amount.currency}
+                      onChange={(e) =>
+                        updateOrderInfo({
+                          amount: {
+                            ...form.orderInfo.amount,
+                            currency: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </InputGroup>
+                </div>
 
-          <label className="flex flex-col gap-1">
-            <span>产品详情 productDetail</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.productDetail}
-              onChange={(e) =>
-                updateOrderInfo({ productDetail: e.target.value })
-              }
-            />
-          </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <InputGroup label="Country">
+                    <StyledInput
+                      value={form.orderInfo.countryCode}
+                      onChange={(e) =>
+                        updateOrderInfo({ countryCode: e.target.value })
+                      }
+                    />
+                  </InputGroup>
+                  <InputGroup label="Origin">
+                    <StyledInput
+                      value={form.orderInfo.origin}
+                      onChange={(e) =>
+                        updateOrderInfo({ origin: e.target.value })
+                      }
+                    />
+                  </InputGroup>
+                </div>
 
-          <label className="flex flex-col gap-1">
-            <span>Origin</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.origin}
-              onChange={(e) => updateOrderInfo({ origin: e.target.value })}
-            />
-          </label>
+                <InputGroup label="Product Detail">
+                  <StyledInput
+                    value={form.orderInfo.productDetail}
+                    onChange={(e) =>
+                      updateOrderInfo({ productDetail: e.target.value })
+                    }
+                  />
+                </InputGroup>
+              </div>
+            </div>
 
-          <label className="flex flex-col gap-1 md:col-span-3">
-            <span>Return URL</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.returnUrl}
-              onChange={(e) => updateOrderInfo({ returnUrl: e.target.value })}
-            />
-          </label>
+            {/* URLs & Webhooks */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+              <SectionHeader icon={LinkIcon} title="链接配置 URLs" />
+              <div className="space-y-4">
+                <InputGroup label="Return URL">
+                  <StyledInput
+                    value={form.orderInfo.returnUrl}
+                    onChange={(e) =>
+                      updateOrderInfo({ returnUrl: e.target.value })
+                    }
+                  />
+                </InputGroup>
+                <InputGroup label="Webhook URL">
+                  <StyledInput
+                    value={form.orderInfo.webhookUrl}
+                    onChange={(e) =>
+                      updateOrderInfo({ webhookUrl: e.target.value })
+                    }
+                  />
+                </InputGroup>
+              </div>
+            </div>
 
-          <label className="flex flex-col gap-1 md:col-span-3">
-            <span>Webhook URL</span>
-            <input
-              className="border rounded px-2 py-1"
-              value={form.orderInfo.webhookUrl}
-              onChange={(e) => updateOrderInfo({ webhookUrl: e.target.value })}
-            />
-          </label>
-          <label className="flex items-center  gap-1">
-            <span>directReturn</span>
-            <input
-              type="checkbox"
-              className="border rounded px-2 py-1 w-4"
-              checked={form.orderInfo.directReturn}
-              onChange={(e) =>
-                updateOrderInfo({ directReturn: e.target.checked })
-              }
-            />
-          </label>
-
-          <label className="flex  items-center gap-1">
-            <span>isexchange</span>
-            <input
-              type="checkbox"
-              className="border rounded px-2 py-1 w-4"
-              checked={form.orderInfo.isexchange}
-              onChange={(e) =>
-                updateOrderInfo({ isexchange: e.target.checked })
-              }
-            />
-          </label>
-
-          <label className="flex  items-center gap-1">
-            <span>enableOneClick</span>
-            <input
-              type="checkbox"
-              className="border rounded px-2 py-1 w-4"
-              checked={form.orderInfo.enableOneClick}
-              onChange={(e) =>
-                updateOrderInfo({ enableOneClick: e.target.checked })
-              }
-            />
-          </label>
-        </div>
-
-        {/* 支付人信息（动态键值对） */}
-        <div className="space-y-2 pt-4">
-          {Object.entries(form.orderInfo.paymentMethod ?? {}).map(
-            ([key, value]) => (
-              <div key={key} className="flex items-center gap-2">
-                <input
-                  className="border rounded px-2 py-1 w-40 bg-gray-50"
-                  value={key}
-                  readOnly
-                />
-                <input
-                  className="border rounded px-2 py-1 flex-1"
-                  value={value}
-                  onChange={(e) =>
-                    updateOrderInfo({
-                      paymentMethod: {
-                        ...form.orderInfo.paymentMethod,
-                        [key]: e.target.value,
-                      },
-                    })
+            {/* Toggles */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+              <SectionHeader icon={ShieldCheck} title="功能开关 Options" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Toggle
+                  label="Direct Return"
+                  checked={form.orderInfo.directReturn}
+                  onChange={(checked) =>
+                    updateOrderInfo({ directReturn: checked })
                   }
+                />
+                <Toggle
+                  label="Is Exchange"
+                  checked={form.orderInfo.isexchange}
+                  onChange={(checked) =>
+                    updateOrderInfo({ isexchange: checked })
+                  }
+                />
+                <Toggle
+                  label="Enable OneClick"
+                  checked={form.orderInfo.enableOneClick}
+                  onChange={(checked) =>
+                    updateOrderInfo({ enableOneClick: checked })
+                  }
+                />
+              </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+              <SectionHeader icon={Wallet} title="支付参数 Payment Params" />
+
+              <div className="space-y-3 mb-4">
+                {Object.entries(form.orderInfo.paymentMethod ?? {}).map(
+                  ([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-100 group"
+                    >
+                      <div
+                        className="w-1/3 text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1.5 rounded truncate"
+                        title={key}
+                      >
+                        {key}
+                      </div>
+                      <input
+                        className="flex-1 text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-700 placeholder-gray-400"
+                        value={value as string}
+                        onChange={(e) =>
+                          updateOrderInfo({
+                            paymentMethod: {
+                              ...form.orderInfo.paymentMethod,
+                              [key]: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                        onClick={() => removePaymentMethodKey(key)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 p-2 border border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors bg-gray-50/50">
+                <input
+                  className="w-1/3 border-none bg-transparent text-sm outline-none focus:ring-0 px-2"
+                  placeholder="New Key"
+                  value={newKey}
+                  onChange={(e) => setNewKey(e.target.value)}
+                />
+                <div className="w-px h-4 bg-gray-300"></div>
+                <input
+                  className="flex-1 border-none bg-transparent outline-none text-sm focus:ring-0 px-2"
+                  placeholder="Value"
+                  value={newValue}
+                  onChange={(e) => setNewValue(e.target.value)}
                 />
                 <button
                   type="button"
-                  className="text-red-600 px-2"
-                  onClick={() => removePaymentMethodKey(key)}
+                  className="p-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={addPaymentMethodPair}
+                  disabled={!newKey}
                 >
-                  删除
+                  <Plus className="w-4 h-4" />
                 </button>
               </div>
-            )
-          )}
-
-          {/* 新增键值对 */}
-          <div className="flex items-center gap-2">
-            <input
-              className="border rounded px-2 py-1 w-40"
-              placeholder="Key"
-              value={newKey}
-              onChange={(e) => setNewKey(e.target.value)}
-            />
-            <input
-              className="border rounded px-2 py-1 flex-1"
-              placeholder="Value"
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-            />
-            <button
-              type="button"
-              className="text-green-600 px-2"
-              onClick={addPaymentMethodPair}
-            >
-              新增
-            </button>
+            </div>
           </div>
-        </div>
-      </fieldset>
 
-      {/* 操作按钮 */}
-      <div className="flex flex-wrap gap-4">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={() => {
-            openCheckoutModal({
-              ...form,
-              orderInfo: {
-                ...form.orderInfo,
-                reference: `test-${Date.now()}`,
-              },
-            });
-          }}
-        >
-          打开弹窗 Open Modal
-        </button>
+          {/* Right Panel: Preview & Actions */}
+          <div className="xl:col-span-7 space-y-6 sticky top-6">
+            {/* Action Bar */}
+            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-gray-100 p-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-yellow-500" />
+                    Checkout Actions
+                  </h2>
+                  <div className="text-sm text-gray-500">
+                    Current Mode:{" "}
+                    <span className="font-semibold text-blue-600">
+                      {demoMode === "embed"
+                        ? "Embed"
+                        : demoMode === "elements"
+                        ? "Elements"
+                        : "Modal"}
+                    </span>
+                  </div>
+                </div>
 
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={async () => {
-            if (!containerRef.current) return;
+                <div className="grid grid-cols-3 gap-4">
+                  <button
+                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-blue-50 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-200 text-blue-700 transition-all active:scale-[0.98]"
+                    onClick={() => {
+                      openCheckoutModal({
+                        ...form,
+                        orderInfo: {
+                          ...form.orderInfo,
+                          reference: `test-${Date.now()}`,
+                        },
+                      });
+                      setDemoMode("modal");
+                    }}
+                  >
+                    <Layout className="w-6 h-6" />
+                    <span className="font-semibold">Open Modal</span>
+                  </button>
 
-            embedRef.current = await embedCheckout(containerRef.current, {
-              ...form,
-              orderInfo: {
-                ...form.orderInfo,
-                reference: `test-${Date.now()}`,
-              },
-            });
-          }}
-        >
-          嵌入收银台 Embed Checkout
-        </button>
-        {/* 打开element 收银台 */}
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={async () => {
-            elementsRef.current = await createElementsCheckout(
-              "#elements-checkout-container",
-              {
-                ...form,
-                orderInfo: {
-                  ...form.orderInfo,
-                  reference: `test-${Date.now()}`,
-                },
-              }
-            );
-          }}
-        >
-          打开element 收银台 Elements Checkout
-        </button>
-      </div>
+                  <button
+                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-[0.98] ${
+                      demoMode === "embed"
+                        ? "border-green-200 bg-green-50 text-green-700"
+                        : "border-gray-100 bg-white text-gray-600 hover:border-gray-200 hover:bg-gray-50"
+                    }`}
+                    onClick={async () => {
+                      setDemoMode("embed");
+                      if (!containerRef.current) return;
+                      // 小延时确保 DOM 渲染
+                      setTimeout(async () => {
+                        if (containerRef.current) {
+                          embedRef.current = await embedCheckout(
+                            containerRef.current,
+                            {
+                              ...form,
+                              orderInfo: {
+                                ...form.orderInfo,
+                                reference: `test-${Date.now()}`,
+                              },
+                            }
+                          );
+                        }
+                      }, 100);
+                    }}
+                  >
+                    <Code className="w-6 h-6" />
+                    <span className="font-semibold">Embed Checkout</span>
+                  </button>
 
-      {/* Elements Checkout 邮箱输入和提交区域 */}
-      {
-        <div className="bg-gray-50 p-4 rounded-lg space-y-4 w-[420px]">
-          <h4 className="text-lg font-medium text-gray-800">
-            Elements Checkout 提交
-          </h4>
-          <div className="flex flex-col gap-2">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-gray-700">
-                邮箱地址
+                  <button
+                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-[0.98] ${
+                      demoMode === "elements"
+                        ? "border-purple-200 bg-purple-50 text-purple-700"
+                        : "border-gray-100 bg-white text-gray-600 hover:border-gray-200 hover:bg-gray-50"
+                    }`}
+                    onClick={async () => {
+                      setDemoMode("elements");
+                      // 小延时确保 DOM 渲染
+                      setTimeout(async () => {
+                        elementsRef.current = await createElementsCheckout(
+                          "#elements-checkout-container",
+                          {
+                            ...form,
+                            orderInfo: {
+                              ...form.orderInfo,
+                              reference: `test-${Date.now()}`,
+                            },
+                          }
+                        );
+                      }, 100);
+                    }}
+                  >
+                    <CreditCard className="w-6 h-6" />
+                    <span className="font-semibold">Elements UI</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Area */}
+            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 min-h-[600px] flex flex-col overflow-hidden">
+              <div className="bg-gray-50 border-b border-gray-100 px-6 py-3 flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400/80"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-400/80"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-400/80"></div>
+                </div>
+                <div className="flex-1 text-center">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-md border border-gray-200 text-xs text-gray-500 shadow-sm">
+                    <Lock className="w-3 h-3" />
+                    secure-checkout.futurepay.global
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 p-8 bg-gray-50/30 relative">
+                {demoMode === "embed" && (
+                  <div className="max-w-[480px] mx-auto w-full animate-in fade-in zoom-in-95 duration-300">
+                    <div className="text-center mb-8 space-y-2">
+                      <h3 className="text-2xl font-bold text-gray-900">
+                        Secure Payment
+                      </h3>
+                      <p className="text-gray-500 text-sm">
+                        Complete your purchase securely
+                      </p>
+                      <div className="flex justify-center gap-4 mt-4">
+                        <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                          <ShieldCheck className="w-3 h-3" /> SSL Encrypted
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+                      <div
+                        ref={containerRef}
+                        className="w-full min-h-[400px]"
+                      />
+                    </div>
+                    <div className="mt-6 text-center">
+                      <div className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        Powered by FuturePay
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {demoMode === "elements" && (
+                  <div className="max-w-[480px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 space-y-6">
+                      <div className="space-y-1 border-b border-gray-100 pb-4">
+                        <h3 className="font-bold text-xl text-gray-900">
+                          Payment Details
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Enter your payment information below
+                        </p>
+                      </div>
+
+                      <div className="space-y-4">
+                        <InputGroup label="Email Address">
+                          <StyledInput
+                            type="email"
+                            placeholder="john@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </InputGroup>
+
+                        {/* Elements Container */}
+                        <div
+                          id="elements-checkout-container"
+                          className="min-h-[200px] rounded-lg"
+                        ></div>
+
+                        <button
+                          className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 active:scale-[0.98]"
+                          disabled={!email || !elementsRef.current}
+                          onClick={async () => {
+                            if (!elementsRef.current || !email) return;
+                            try {
+                              const data =
+                                await elementsRef.current.elementsSubmit({
+                                  paymentMethod: {
+                                    shopperEmail: email,
+                                  },
+                                });
+                              console.log("提交成功:", data);
+                              alert("Payment Submitted Successfully!");
+                            } catch (error) {
+                              console.error("提交失败:", error);
+                              alert("Payment Failed: " + error.message);
+                            }
+                          }}
+                        >
+                          Pay {form.orderInfo.amount.currency}{" "}
+                          {form.orderInfo.amount.value}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {demoMode === "modal" && (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400 space-y-4">
+                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+                      <Layout className="w-10 h-10 text-gray-300" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-600">
+                        Modal is Active
+                      </p>
+                      <p className="text-sm">
+                        The payment modal should be open on your screen.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer Info */}
+            <div className="flex justify-between text-xs text-gray-400 px-2">
+              <span>SDK Version: 2.0.0-beta.1</span>
+              <span className="flex items-center gap-1">
+                <Globe className="w-3 h-3" />
+                FuturePay Global
               </span>
-              <input
-                id="email"
-                type="email"
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="请输入邮箱地址"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <div
-              className="flex flex-col gap-2"
-              id="elements-checkout-container"
-            ></div>
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled={!email || !elementsRef.current}
-              onClick={async () => {
-                if (!elementsRef.current || !email) return;
-
-                try {
-                  const data = await elementsRef.current.elementsSubmit({
-                    paymentMethod: {
-                      shopperEmail: email,
-                    },
-                  });
-                  console.log("提交成功:", data);
-                } catch (error) {
-                  console.error("提交失败:", error);
-                }
-              }}
-            >
-              提交支付 Elements Submit
-            </button>
-          </div>
-        </div>
-      }
-
-      {/* 嵌入式收银台展示 */}
-      <div className="mt-8 space-y-4">
-        {/* 顶部文案 */}
-        <div className="text-center space-y-2">
-          <h3 className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2">
-            安全支付收银台
-          </h3>
-          <p className="text-sm text-gray-600">
-            支持多种支付方式 · 银行级安全加密 · 全球支付网络
-          </p>
-          <div className="flex justify-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-              SSL加密
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-              PCI合规
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
-              实时验证
-            </span>
-          </div>
-        </div>
-
-        {/* 嵌入容器 */}
-        <div className="relative">
-          <div ref={containerRef} className="w-[420px] mx-auto" />
-        </div>
-
-        {/* 底部提示文案 */}
-        <div className="text-center space-y-3 pt-4">
-          <div className="flex justify-center gap-6 text-xs text-gray-500">
-            <span className="flex items-center gap-1">🔒 数据加密传输</span>
-            <span className="flex items-center gap-1">⚡ 秒级支付确认</span>
-            <span className="flex items-center gap-1">🌍 支持全球支付</span>
-          </div>
-          <p className="text-xs text-gray-400 max-w-md mx-auto">
-            我们采用业界领先的安全技术，确保您的支付信息安全。支持Visa、MasterCard、American
-            Express等主流支付方式。
-          </p>
-          <div className="inline-flex items-center gap-2 text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-            由 FuturePay 提供技术支持
+            </div>
           </div>
         </div>
       </div>
