@@ -41,9 +41,6 @@ const defaultFormData = (): CheckoutOptions => ({
       currency: "USD",
       value: 100,
     },
-    paymentMethod: {
-      type: "intercards",
-    },
     isexchange: false,
     productDetail: "Premium Subscription Plan",
     countryCode: "HK",
