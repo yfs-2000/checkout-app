@@ -151,10 +151,10 @@ export const CheckoutForm = () => {
     }
     return defaultFormData();
   });
-  const containerRef = useRef<HTMLDivElement>(null);
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
   const [email, setEmail] = useState("");
+  const [elementsSubmitting, setElementsSubmitting] = useState(false);
   const [demoMode, setDemoMode] = useState<"embed" | "elements" | null>(
     "embed"
   );
@@ -217,6 +217,22 @@ export const CheckoutForm = () => {
     setForm((prev) => ({
       ...prev,
       checkoutConfig: { ...prev?.checkoutConfig, ...updates },
+    }));
+  };
+  const updateCssVariables = (
+    updates: Partial<
+      NonNullable<CheckoutOptions["checkoutConfig"]>["cssVariables"]
+    >
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      checkoutConfig: {
+        ...prev.checkoutConfig,
+        cssVariables: {
+          ...(prev.checkoutConfig?.cssVariables || {}),
+          ...updates,
+        },
+      },
     }));
   };
   const embedRef = useRef<CheckoutInstance | null>(null);
@@ -303,6 +319,115 @@ export const CheckoutForm = () => {
                     value={form.sessionToken}
                     onChange={(e) =>
                       handleChange("sessionToken", e.target.value || undefined)
+                    }
+                  />
+                </InputGroup>
+              </div>
+            </div>
+
+            {/* Style Config */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+              <SectionHeader icon={Layout} title="样式配置 Styles" />
+              <div className="grid grid-cols-2 gap-4">
+                <InputGroup label="Primary Color 主色">
+                  <StyledInput
+                    placeholder="#007bff"
+                    value={
+                      form.checkoutConfig?.cssVariables?.primaryColor || ""
+                    }
+                    onChange={(e) =>
+                      updateCssVariables({
+                        primaryColor: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="Background 背景">
+                  <StyledInput
+                    placeholder="#ffffff"
+                    value={form.checkoutConfig?.cssVariables?.background || ""}
+                    onChange={(e) =>
+                      updateCssVariables({
+                        background: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="Foreground 文本">
+                  <StyledInput
+                    placeholder="#0f172a"
+                    value={form.checkoutConfig?.cssVariables?.foreground || ""}
+                    onChange={(e) =>
+                      updateCssVariables({
+                        foreground: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="Secondary Foreground 次文本">
+                  <StyledInput
+                    placeholder="#475569"
+                    value={
+                      form.checkoutConfig?.cssVariables?.secondaryForeground ||
+                      ""
+                    }
+                    onChange={(e) =>
+                      updateCssVariables({
+                        secondaryForeground: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="Card Background 卡片背景">
+                  <StyledInput
+                    placeholder="#f8fafc"
+                    value={
+                      form.checkoutConfig?.cssVariables?.cardBackground || ""
+                    }
+                    onChange={(e) =>
+                      updateCssVariables({
+                        cardBackground: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="Secondary 次级色">
+                  <StyledInput
+                    placeholder="#94a3b8"
+                    value={form.checkoutConfig?.cssVariables?.secondary || ""}
+                    onChange={(e) =>
+                      updateCssVariables({
+                        secondary: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="Border 边框色">
+                  <StyledInput
+                    placeholder="#e2e8f0"
+                    value={form.checkoutConfig?.cssVariables?.border || ""}
+                    onChange={(e) =>
+                      updateCssVariables({
+                        border: e.target.value || undefined,
+                      })
+                    }
+                  />
+                </InputGroup>
+
+                <InputGroup label="侧边栏背景色">
+                  <StyledInput
+                    placeholder="#e2e8f0"
+                    value={form.checkoutConfig?.cssVariables?.accent || ""}
+                    onChange={(e) =>
+                      updateCssVariables({
+                        accent: e.target.value || undefined,
+                      })
                     }
                   />
                 </InputGroup>
@@ -674,9 +799,18 @@ export const CheckoutForm = () => {
 
                         <button
                           className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 active:scale-[0.98]"
-                          disabled={!email || !elementsRef.current}
+                          disabled={
+                            !email || !elementsRef.current || elementsSubmitting
+                          }
                           onClick={async () => {
-                            if (!elementsRef.current || !email) return;
+                            if (
+                              !elementsRef.current ||
+                              !email ||
+                              elementsSubmitting
+                            )
+                              return;
+
+                            setElementsSubmitting(true);
                             try {
                               const data =
                                 await elementsRef.current.elementsSubmit({
@@ -685,15 +819,17 @@ export const CheckoutForm = () => {
                                   },
                                 });
                               console.log("提交成功:", data);
-                              alert("Payment Submitted Successfully!");
                             } catch (error) {
                               console.error("提交失败:", error);
                               alert("Payment Failed: " + error.message);
+                            } finally {
+                              setElementsSubmitting(false);
                             }
                           }}
                         >
-                          You will pay {form.orderInfo.amount.currency}{" "}
-                          {form.orderInfo.amount.value}
+                          {elementsSubmitting
+                            ? "Processing..."
+                            : `You will pay ${form.orderInfo.amount.currency} ${form.orderInfo.amount.value}`}
                         </button>
                       </div>
                     </div>
