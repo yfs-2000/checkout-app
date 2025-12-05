@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@futurepay/checkout-sdk':
-        specifier: 2.0.0-beta.3
-        version: 2.0.0-beta.3
+        specifier: 2.0.0
+        version: 2.0.0
       '@radix-ui/react-checkbox':
         specifier: ^1.3.3
         version: 1.3.3(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -299,8 +299,8 @@ packages:
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@futurepay/checkout-sdk@2.0.0-beta.3':
-    resolution: {integrity: sha512-D8zCVQQXkbWbADunzQSe7Zhhs4mYmYIztXqwryNGWrfq4nE/cKzG/Mn4CNMMvnhm5+YK/5hU/pE0g23EkCYceA==}
+  '@futurepay/checkout-sdk@2.0.0':
+    resolution: {integrity: sha512-GjlTYIAZTCEUEpZt6y9SkeIQ3AlTDvZViPIvO3sCzaBb47VgyW26KhgIBIdoiAF/jIJlT76yYXRBc2TB25G53w==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2413,7 +2413,7 @@ snapshots:
       '@eslint/core': 0.15.1
       levn: 0.4.1
 
-  '@futurepay/checkout-sdk@2.0.0-beta.3': {}
+  '@futurepay/checkout-sdk@2.0.0': {}
 
   '@humanfs/core@0.19.1': {}
 
