@@ -853,7 +853,7 @@ export const CheckoutForm = () => {
 
             {/* Footer Info */}
             <div className="flex justify-between text-xs text-gray-400 px-2">
-              <span>SDK Version: 2.0.0-beta.1</span>
+              <span>SDK Version: 2.0.7</span>
               <span className="flex items-center gap-1">
                 <Globe className="w-3 h-3" />
                 FuturePay Global
