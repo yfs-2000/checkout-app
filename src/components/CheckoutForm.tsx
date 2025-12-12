@@ -309,7 +309,21 @@ export const CheckoutForm = () => {
                     <option value="system">System Preference</option>
                   </StyledSelect>
                 </InputGroup>
-
+                <InputGroup label="Lng" className="col-span-2">
+                  <StyledSelect
+                      value={form.checkoutConfig?.lng || ""}
+                      onChange={(e) =>
+                          updateCheckoutConfig({
+                            lng: e.target.value,
+                          })
+                      }
+                  >
+                    <option value="">Default</option>
+                    <option value="zh">中文</option>
+                    <option value="ar">阿拉伯语</option>
+                    <option value="en">英文</option>
+                  </StyledSelect>
+                </InputGroup>
                 <InputGroup label="Session Token" className="col-span-2">
                   <StyledInput
                     placeholder="Optional session token"
