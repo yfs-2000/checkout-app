@@ -236,10 +236,10 @@ export const CheckoutForm = () => {
   const elementsRef = useRef<CheckoutInstance | null>(null);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6 font-sans text-gray-900">
-      <div className="max-w-[1600px] mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50/50 px-2 py-3 sm:p-6 font-sans text-gray-900">
+      <div className="max-w-[1600px] mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <header className="flex items-center justify-between bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100">
+        <header className="flex items-center justify-between bg-white px-4 py-4 sm:px-6 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 p-2 rounded-lg">
               <CreditCard className="w-6 h-6 text-white" />
@@ -260,11 +260,11 @@ export const CheckoutForm = () => {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6 items-start">
           {/* Left Panel: Configuration */}
-          <div className="xl:col-span-5 space-y-6">
+          <div className="xl:col-span-5 space-y-4 sm:space-y-6">
             {/* Basic Settings */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 transition-all hover:shadow-md">
               <SectionHeader icon={Settings} title="基础配置 Environment" />
               <div className="grid grid-cols-2 gap-4">
                 <InputGroup label="Environment">
@@ -337,7 +337,7 @@ export const CheckoutForm = () => {
             </div>
 
             {/* Style Config */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 transition-all hover:shadow-md">
               <SectionHeader icon={Layout} title="样式配置 Styles" />
               <div className="grid grid-cols-2 gap-4">
                 <InputGroup label="Primary Color 主色">
@@ -446,7 +446,7 @@ export const CheckoutForm = () => {
             </div>
 
             {/* Order Details */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 transition-all hover:shadow-md">
               <SectionHeader icon={ShoppingCart} title="订单详情 Order Info" />
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -510,7 +510,7 @@ export const CheckoutForm = () => {
             </div>
 
             {/* URLs & Webhooks */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 transition-all hover:shadow-md">
               <SectionHeader icon={LinkIcon} title="链接配置 URLs" />
               <div className="space-y-4">
                 <InputGroup label="Return URL">
@@ -533,7 +533,7 @@ export const CheckoutForm = () => {
             </div>
 
             {/* Toggles */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 transition-all hover:shadow-md">
               <SectionHeader icon={ShieldCheck} title="功能开关 Options" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Toggle
@@ -561,7 +561,7 @@ export const CheckoutForm = () => {
             </div>
 
             {/* Payment Methods */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all hover:shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 transition-all hover:shadow-md">
               <SectionHeader icon={Wallet} title="支付参数 Payment Params" />
 
               <div className="space-y-3 mb-4">
@@ -628,9 +628,9 @@ export const CheckoutForm = () => {
           </div>
 
           {/* Right Panel: Preview & Actions */}
-          <div className="xl:col-span-7 space-y-6 sticky top-6">
+          <div className="xl:col-span-7 space-y-4 sm:space-y-6 xl:sticky xl:top-6">
             {/* Action Bar */}
-            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-gray-100 p-6">
+            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-gray-100 p-4 sm:p-6">
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -738,7 +738,7 @@ export const CheckoutForm = () => {
 
             {/* Preview Area */}
             <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 min-h-[600px] flex flex-col overflow-hidden">
-              <div className="bg-gray-50 border-b border-gray-100 px-6 py-3 flex items-center gap-2">
+              <div className="bg-gray-50 border-b border-gray-100 px-3 py-3 sm:px-6 flex items-center gap-2">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400/80"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400/80"></div>
@@ -752,7 +752,7 @@ export const CheckoutForm = () => {
                 </div>
               </div>
 
-              <div className="flex-1 p-8 bg-gray-50/30 relative">
+              <div className="flex-1 p-3 sm:p-8 bg-gray-50/30 relative">
                 {demoMode === "embed" && (
                   <div className="max-w-[480px] mx-auto w-full animate-in fade-in zoom-in-95 duration-300">
                     <div className="text-center mb-8 space-y-2">
@@ -782,7 +782,7 @@ export const CheckoutForm = () => {
 
                 {demoMode === "elements" && (
                   <div className="max-w-[480px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 space-y-6">
+                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 space-y-4 sm:space-y-6">
                       <div className="space-y-1 border-b border-gray-100 pb-4">
                         <h3 className="font-bold text-xl text-gray-900">
                           Payment Details
@@ -848,7 +848,7 @@ export const CheckoutForm = () => {
                 )}
 
                 {demoMode === "modal" && (
-                  <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400 space-y-4">
+                  <div className="h-full flex flex-col items-center justify-center text-center p-4 sm:p-8 text-gray-400 space-y-4">
                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
                       <Layout className="w-10 h-10 text-gray-300" />
                     </div>

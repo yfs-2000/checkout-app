@@ -3,7 +3,7 @@ import { CheckoutForm } from "./components/CheckoutForm";
 
 function App() {
   return (
-    <div className="p-4">
+    <div>
       <CheckoutForm />
     </div>
   );
