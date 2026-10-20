@@ -44,7 +44,7 @@ const defaultFormData = (): CheckoutOptions => ({
     isexchange: false,
     productDetail: "Premium Subscription Plan",
     countryCode: "HK",
-    origin: "fffmall.com",
+    origin: "checkout-demo.futurepay-develop.com",
     returnUrl: "https://futurepay.global/",
     webhookUrl: "https://futurepay.global/webhook",
     enableOneClick: false,
@@ -153,7 +153,7 @@ export const CheckoutForm = () => {
   const [email, setEmail] = useState("");
   const [elementsSubmitting, setElementsSubmitting] = useState(false);
   const [demoMode, setDemoMode] = useState<"embed" | "elements" | null>(
-    "embed"
+    "embed",
   );
 
   const removePaymentMethodKey = (key: string) => {
@@ -167,7 +167,7 @@ export const CheckoutForm = () => {
     if (
       Object.prototype.hasOwnProperty.call(
         form.orderInfo?.paymentMethod,
-        newKey
+        newKey,
       )
     ) {
       alert("该 Key 已存在");
@@ -195,7 +195,7 @@ export const CheckoutForm = () => {
   // 通用字段更新
   const handleChange = <K extends keyof CheckoutOptions>(
     key: K,
-    value: CheckoutOptions[K]
+    value: CheckoutOptions[K],
   ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -209,7 +209,7 @@ export const CheckoutForm = () => {
   };
 
   const updateCheckoutConfig = (
-    updates: Partial<CheckoutOptions["checkoutConfig"]>
+    updates: Partial<CheckoutOptions["checkoutConfig"]>,
   ) => {
     setForm((prev) => ({
       ...prev,
@@ -219,7 +219,7 @@ export const CheckoutForm = () => {
   const updateCssVariables = (
     updates: Partial<
       NonNullable<CheckoutOptions["checkoutConfig"]>["cssVariables"]
-    >
+    >,
   ) => {
     setForm((prev) => ({
       ...prev,
@@ -285,7 +285,7 @@ export const CheckoutForm = () => {
                     onChange={(e) =>
                       handleChange(
                         "mode",
-                        e.target.value as "payment" | "subscription"
+                        e.target.value as "payment" | "subscription",
                       )
                     }
                   >
@@ -311,12 +311,12 @@ export const CheckoutForm = () => {
                 </InputGroup>
                 <InputGroup label="Lng" className="col-span-2">
                   <StyledSelect
-                      value={form.checkoutConfig?.lng || ""}
-                      onChange={(e) =>
-                          updateCheckoutConfig({
-                            lng: e.target.value,
-                          })
-                      }
+                    value={form.checkoutConfig?.lng || ""}
+                    onChange={(e) =>
+                      updateCheckoutConfig({
+                        lng: e.target.value,
+                      })
+                    }
                   >
                     <option value="">Default</option>
                     <option value="zh">中文</option>
@@ -602,7 +602,7 @@ export const CheckoutForm = () => {
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                  )
+                  ),
                 )}
               </div>
 
@@ -648,8 +648,8 @@ export const CheckoutForm = () => {
                       {demoMode === "embed"
                         ? "Embed"
                         : demoMode === "elements"
-                        ? "Elements"
-                        : "Modal"}
+                          ? "Elements"
+                          : "Modal"}
                     </span>
                   </div>
                 </div>
@@ -696,7 +696,7 @@ export const CheckoutForm = () => {
                               ...form.orderInfo,
                               reference: `test-${Date.now()}`,
                             },
-                          }
+                          },
                         );
                       }, 100);
                     }}
@@ -729,7 +729,7 @@ export const CheckoutForm = () => {
                               ...form.orderInfo,
                               reference: `test-${Date.now()}`,
                             },
-                          }
+                          },
                         );
                       }, 100);
                     }}
