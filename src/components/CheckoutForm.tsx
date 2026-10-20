@@ -557,6 +557,11 @@ export const CheckoutForm = () => {
                     updateOrderInfo({ enableOneClick: checked })
                   }
                 />
+                <Toggle
+                  label="Dynamic Amount (仅 Elements)"
+                  checked={form.dynamicAmount}
+                  onChange={(checked) => handleChange("dynamicAmount", checked)}
+                />
               </div>
             </div>
 

@@ -216,6 +216,7 @@ checkout.postMessage({
 | callbacks            | object | 否   | 回调函数配置                |
 | style                | object | 否   | 样式配置                    |
 | modal                | object | 否   | 弹窗配置                    |
+| dynamicAmount        | boolean | 否  | 金额是否可能在收银台加载后变化，默认 false，仅 createElements 生效。开启后拉起 Apple Pay / Google Pay 面板时会重新请求订单接口获取最新金额；商户需在改动金额后先更新订单 |
 
 #### orderInfo 订单信息
 
